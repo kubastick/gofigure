@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/EverythingMe/gofigure/json"
+	"github.com/EverythingMe/gofigure/toml" // This import will work only after accepting the pull request you can alternatively use "gofigure/toml"
 	"github.com/EverythingMe/gofigure/yaml"
 )
 
@@ -80,6 +81,29 @@ func TestJsonLoader(t *testing.T) {
 	}
 
 	err = loader.LoadFile(&conf, "./testdata/test.json")
+	if err != nil {
+		t.Errorf("Error reading single file: %s", err)
+	}
+
+}
+
+func TestTOMLLoader(t *testing.T) {
+	conf := config{}
+	loader := Loader{
+		decoder:    toml.Decoder{},
+		StrictMode: true,
+	}
+
+	err := loader.LoadRecursive(&conf, "./testdata")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if !reflect.DeepEqual(conf, expectedConf) {
+		t.Errorf("Decoded data not as expected: %v", conf)
+	}
+
+	err = loader.LoadFile(&conf, "./testdata/test.toml")
 	if err != nil {
 		t.Errorf("Error reading single file: %s", err)
 	}
